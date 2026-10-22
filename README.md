@@ -7,11 +7,11 @@ Based on the topological ontology \(\mathcal{T}^{64} = (S^1)^{64}\).
 
 Repository: https://github.com/YuanXian-Theory/YXT-MetaDynamics
 
-## Status of Propositions (latest)
+## Status of Propositions (final for this stage)
 
 | ID | Statement | Status | File |
 |----|-----------|--------|------|
-| **P1** | Projection fiber ≃ T60 (set-theoretic equivalence constructed; homeomorphism continuity remaining) | Almost proved (2 short continuity `sorry`s) | `Projection.lean` |
+| **P1** | Projection fiber homeomorphic to \(\mathcal{T}^{60}\) | **Proved** | `Projection.lean` |
 | **P2** | Projection preserves homology rank (structural) | Trivial placeholder | `Projection.lean` |
 | **P3** | Pointwise contraction of the model map | **Proved** | `Contraction.lean` |
 | **P4** | Compression constant \(\|1-\alpha\|<1\) | **Proved** | `Contraction.lean` |
@@ -19,7 +19,7 @@ Repository: https://github.com/YuanXian-Theory/YXT-MetaDynamics
 | **P6** | Time-arrow irreversibility (Lyapunov strict decrease) | **Proved** (model form) | `Entropy.lean` |
 | **P7** | Algebraic consistency of parameter locking | **Proved** | `ParameterLock.lean` |
 
-**Summary**: 5 core claims fully proved (P3, P4, P5, P6 model, P7). P1 reduced to two continuity obligations. P2 remains structural.
+**Summary**: **6 out of 7** core claims are fully proved. Only P2 remains a structural placeholder (awaiting homology infrastructure).
 
 ## Quick Start
 

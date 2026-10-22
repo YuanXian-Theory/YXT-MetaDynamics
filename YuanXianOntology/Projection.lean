@@ -1,23 +1,23 @@
 import YuanXianOntology.Basic
 import Mathlib.Topology.Homeomorph
 import Mathlib.Data.Fin.Basic
-import Mathlib.Logic.Equiv.Basic
-import Mathlib.Tactic.FinCases
+import Mathlib.Topology.Constructions
+import Mathlib.Topology.ContinuousFunction.Basic
 
 /-!
 # Projection properties (P1 & P2)
 
-We give an explicit set-theoretic equivalence between the fiber of `Proj`
-and `T60`. Turning it into a homeomorphism still needs continuity
-arguments with respect to the product topology; that last step remains
-a `sorry` for now, but the underlying bijection is fully constructed.
+We construct an explicit homeomorphism between the fiber of `Proj`
+and `T60`, completing **P1**.
 -/
 
 namespace YuanXianOntology
 
 /-- Extract the last 60 coordinates from a point of `T64`. -/
 def dropFirst4 (x : T64) : T60 :=
-  fun i => x (Fin.castLE (by decide : 60 ≤ 64) i + ⟨4, by decide⟩)
+  fun i => x ⟨(i : ℕ) + 4, by
+    have := i.isLt
+    omega⟩
 
 /-- Rebuild a point of `T64` from a 4-tuple and a 60-tuple. -/
 def combine (y : T4) (z : T60) : T64 :=
@@ -25,35 +25,48 @@ def combine (y : T4) (z : T60) : T64 :=
     if h : (i : ℕ) < 4 then
       y ⟨i, h⟩
     else
-      z ⟨i - 4, by
-        have : (i : ℕ) ≥ 4 := Nat.le_of_not_lt h
-        have hi : (i : ℕ) < 64 := i.isLt
+      z ⟨(i : ℕ) - 4, by
+        have hi := i.isLt
+        have : 4 ≤ (i : ℕ) := Nat.le_of_not_lt h
         omega⟩
 
-/-- The combination map recovers the original point when the first four
-coordinates match `y`. -/
-theorem combine_drop (y : T4) (x : T64) (hx : Proj x = y) :
-    combine y (dropFirst4 x) = x := by
-  ext i
-  simp [combine, dropFirst4, Proj] at *
-  split_ifs with h
-  · -- i < 4
-    have : x (Fin.castLE (by decide : 4 ≤ 64) ⟨i, h⟩) = y ⟨i, h⟩ := by
-      simpa [Proj] using congr_fun hx ⟨i, h⟩
-    simpa using this.symm
-  · -- i ≥ 4
-    rfl
-
-/-- Dropping after combining recovers the 60-tuple. -/
+/-- Combining and then dropping recovers the 60-tuple. -/
 theorem drop_combine (y : T4) (z : T60) :
     dropFirst4 (combine y z) = z := by
   ext i
   simp [dropFirst4, combine]
   split_ifs with h
-  · -- contradiction: i+4 < 4 is impossible
-    have : (i : ℕ) + 4 < 4 := h
+  · -- (i+4 < 4) is impossible
     omega
   · rfl
+
+/-- Dropping and then combining recovers the original point on the fiber. -/
+theorem combine_drop (y : T4) (x : T64) (hx : Proj x = y) :
+    combine y (dropFirst4 x) = x := by
+  ext i
+  simp [combine, dropFirst4, Proj] at *
+  split_ifs with h
+  · -- i < 4 : use the fiber condition
+    have := congr_fun hx ⟨i, h⟩
+    simpa [Proj] using this.symm
+  · -- i ≥ 4
+    rfl
+
+/-- Continuity of `dropFirst4`. -/
+theorem continuous_dropFirst4 : Continuous dropFirst4 :=
+  continuous_pi fun i => continuous_apply _
+
+/-- Continuity of `combine y` for fixed `y`. -/
+theorem continuous_combine (y : T4) : Continuous (combine y) := by
+  apply continuous_pi
+  intro i
+  split_ifs with h
+  · exact continuous_const
+  · exact continuous_apply _
+
+/-- The fiber as a subtype inherits the subspace topology. -/
+instance (y : T4) : TopologicalSpace {x : T64 // Proj x = y} :=
+  instTopologicalSpaceSubtype
 
 /-- Set-theoretic equivalence between the fiber and `T60`. -/
 def fiberEquiv (y : T4) : {x : T64 // Proj x = y} ≃ T60 where
@@ -63,8 +76,7 @@ def fiberEquiv (y : T4) : {x : T64 // Proj x = y} ≃ T60 where
     simp [Proj, combine]
     split_ifs with h
     · rfl
-    · -- i ≥ 4 cannot happen for i : Fin 4
-      have : (i : ℕ) < 4 := i.isLt
+    · have : (i : ℕ) < 4 := i.isLt
       omega⟩
   left_inv := by
     intro ⟨x, hx⟩
@@ -73,21 +85,34 @@ def fiberEquiv (y : T4) : {x : T64 // Proj x = y} ≃ T60 where
     intro z
     simp [drop_combine y z]
 
+/-- Continuity of the forward direction of `fiberEquiv`. -/
+theorem continuous_fiberEquiv_toFun (y : T4) :
+    Continuous (fiberEquiv y).toFun := by
+  apply Continuous.comp continuous_dropFirst4 continuous_subtype_val
+
+/-- Continuity of the inverse direction of `fiberEquiv`. -/
+theorem continuous_fiberEquiv_invFun (y : T4) :
+    Continuous (fiberEquiv y).invFun := by
+  apply Continuous.subtype_mk (continuous_combine y)
+  intro z
+  ext i
+  simp [Proj, combine]
+  split_ifs with h
+  · rfl
+  · have : (i : ℕ) < 4 := i.isLt
+    omega
+
 /--
-**P1** (almost proved): There exists a set-theoretic equivalence
-between the fiber and `T60`. Upgrading it to a homeomorphism requires
-checking continuity of `dropFirst4` and `combine` with respect to the
-product topology; that step is left as a short `sorry`.
+**P1** (fully proved): The fiber of the projection over any point
+is homeomorphic to `T60`.
 -/
 theorem projection_fiber_homeomorphic (y : T4) :
     Nonempty (Homeomorph {x : T64 // Proj x = y} T60) := by
-  -- We already have an equivalence; we only need to promote it to a Homeomorph.
-  -- Continuity of the two directions is the remaining obligation.
-  refine ⟨{ toEquiv := fiberEquiv y, continuous_toFun := ?_, continuous_invFun := ?_ }⟩
-  · -- continuity of dropFirst4 on the subtype
-    sorry
-  · -- continuity of combine
-    sorry
+  exact ⟨{
+    toEquiv := fiberEquiv y
+    continuous_toFun := continuous_fiberEquiv_toFun y
+    continuous_invFun := continuous_fiberEquiv_invFun y
+  }⟩
 
 /--
 **P2** (structural form).

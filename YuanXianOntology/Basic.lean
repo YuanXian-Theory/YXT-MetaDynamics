@@ -1,6 +1,7 @@
 import Mathlib.Topology.Instances.AddCircle
 import Mathlib.Topology.Homeomorph
 import Mathlib.Data.Fin.Basic
+import Mathlib.Topology.Constructions
 
 /-!
 # Basic definitions for Yuanxian Ontology
@@ -24,14 +25,18 @@ def T4 : Type := Fin 4 → AddCircle (1 : ℝ)
 /-- 60-dimensional internal space torus. -/
 def T60 : Type := Fin 60 → AddCircle (1 : ℝ)
 
+instance : TopologicalSpace T64 := Pi.topologicalSpace
+instance : TopologicalSpace T4  := Pi.topologicalSpace
+instance : TopologicalSpace T60 := Pi.topologicalSpace
+
 /--
 Projection from \(\mathcal{T}^{64}\) onto the first 4 coordinates.
-This is the basic (non-weighted) projection used in the paper.
 -/
 def Proj : T64 → T4 :=
   fun x i => x (Fin.castLE (by decide : 4 ≤ 64) i)
 
-/-- Convenience notation for the 64-torus. -/
-notation "𝕋⁶⁴" => T64
+/-- Continuity of the basic projection (immediate from product topology). -/
+theorem continuous_Proj : Continuous Proj :=
+  continuous_pi fun i => continuous_apply _
 
 end YuanXianOntology

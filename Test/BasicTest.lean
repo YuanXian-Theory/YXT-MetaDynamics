@@ -34,7 +34,10 @@ example (f : T64 → ℝ) : lyapunov (selfMap f) = (1/2) * lyapunov f :=
   lyapunov_selfMap f
 example : lyapunov constTwo = 0 := lyapunov_fixedPoint
 
--- Projection surjectivity
+-- Projection
 example : Function.Surjective Proj := Proj_surjective
+example : Continuous Proj := continuous_Proj
+example (y : T4) : Nonempty (Homeomorph {x : T64 // Proj x = y} T60) :=
+  projection_fiber_homeomorphic y
 
 end YuanXianOntology.Test
