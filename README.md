@@ -7,19 +7,19 @@ Based on the topological ontology \(\mathcal{T}^{64} = (S^1)^{64}\).
 
 Repository: https://github.com/YuanXian-Theory/YXT-MetaDynamics
 
-## Status of Propositions (final for this stage)
+## Status of Propositions
 
 | ID | Statement | Status | File |
 |----|-----------|--------|------|
 | **P1** | Projection fiber homeomorphic to \(\mathcal{T}^{60}\) | **Proved** | `Projection.lean` |
-| **P2** | Projection preserves homology rank (structural) | Trivial placeholder | `Projection.lean` |
+| **P2** | `T64 \simeq T4 \times T60` (product homeomorphism) + homology rank claim recorded as future work | **Topological form proved**; homology form pending Mathlib | `Projection.lean` |
 | **P3** | Pointwise contraction of the model map | **Proved** | `Contraction.lean` |
 | **P4** | Compression constant \(\|1-\alpha\|<1\) | **Proved** | `Contraction.lean` |
 | **P5** | Existence & uniqueness of ground-state fixed point | **Proved** | `Contraction.lean` |
-| **P6** | Time-arrow irreversibility (Lyapunov strict decrease) | **Proved** (model form) | `Entropy.lean` |
+| **P6** | Time-arrow irreversibility (Lyapunov) | **Proved** (model form) | `Entropy.lean` |
 | **P7** | Algebraic consistency of parameter locking | **Proved** | `ParameterLock.lean` |
 
-**Summary**: **6 out of 7** core claims are fully proved. Only P2 remains a structural placeholder (awaiting homology infrastructure).
+**Summary**: The topological core of P1–P7 is essentially complete. The only remaining open mathematical obligation is the concrete singular-homology rank equality of P2, which depends on Mathlib homology infrastructure not yet connected for these spaces.
 
 ## Quick Start
 
