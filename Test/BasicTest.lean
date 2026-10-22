@@ -1,6 +1,8 @@
 import YuanXianOntology.Basic
 import YuanXianOntology.Contraction
 import YuanXianOntology.ParameterLock
+import YuanXianOntology.Entropy
+import YuanXianOntology.Projection
 
 /-!
 # Compilation and sanity checks for the proved statements
@@ -12,11 +14,11 @@ namespace YuanXianOntology.Test
 example : |1 - alpha| < 1 := compression_constant
 example : 0 < alpha ∧ alpha < 1 := alpha_pos_lt_one
 
--- P5 (now fully proved)
+-- P5
 example : ∃! psi : T64 → ℝ, selfMap psi = psi := ground_state_unique
 example : selfMap constTwo = constTwo := constTwo_is_fixedPoint
 
--- Pointwise contraction
+-- Pointwise contraction (P3)
 example (f g : T64 → ℝ) (x : T64) :
     |selfMap f x - selfMap g x| = (1/2) * |f x - g x| :=
   selfMap_pointwise_contraction f g x
@@ -26,6 +28,13 @@ example := parameter_locking_consistent
 example : varphi < 0 := varphi_neg
 example : 1 < phi := phi_gt_one
 example : 0 < phi := phi_pos
-example : 0 < |varphi| := abs_varphi_pos
+
+-- P6 (model form)
+example (f : T64 → ℝ) : lyapunov (selfMap f) = (1/2) * lyapunov f :=
+  lyapunov_selfMap f
+example : lyapunov constTwo = 0 := lyapunov_fixedPoint
+
+-- Projection surjectivity
+example : Function.Surjective Proj := Proj_surjective
 
 end YuanXianOntology.Test
