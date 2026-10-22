@@ -2,27 +2,36 @@ import YuanXianOntology.Basic
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.SpecialFunctions.Sqrt
 import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.FieldSimp
 
 /-!
-# Parameter locking consistency (P7)
-
-Formalizes the algebraic relations that lock the key constants
-of the theory via topological invariants.
+# Parameter locking consistency (P7) and golden-ratio lemmas
 -/
 
 namespace YuanXianOntology
 
-/-- Euler characteristic of a type (placeholder; for a torus it is 0). -/
+/-- Euler characteristic placeholder (torus has χ = 0). -/
 def chi (_T : Type) : ℤ := 0
 
-/-- Golden ratio \(\phi = (1+\sqrt{5})/2\). -/
+/-- Golden ratio \(\phi = (1 + \sqrt{5})/2\). -/
 def phi : ℝ := (1 + Real.sqrt 5) / 2
 
-/-- The auxiliary quantity \(\varphi = (1-\phi)/\phi\) appearing in the paper. -/
+/-- Auxiliary quantity \(\varphi = (1 - \phi)/\phi\) appearing in the paper. -/
 def varphi : ℝ := (1 - phi) / phi
 
+/-- Golden ratio is greater than 1. -/
+theorem phi_gt_one : 1 < phi := by
+  unfold phi
+  norm_num
+
+/-- Golden ratio is positive. -/
+theorem phi_pos : 0 < phi := by
+  unfold phi
+  positivity
+
 /--
-**P7** (fully proved): Algebraic consistency of the main parameter-locking
+**P7** (proved): Algebraic consistency of the main parameter-locking
 relations used in the paper.
 -/
 theorem parameter_locking_consistent :
@@ -32,9 +41,25 @@ theorem parameter_locking_consistent :
     Psi_SR = 1 ∧ delta_YXT = Real.exp (-2 * Real.pi * |varphi|) := by
   simp [Real.sqrt_one]
 
-/-- Numerical check that the golden-ratio quantity is negative (as expected). -/
+/-- `varphi` is negative (as required by the decay factor). -/
 theorem varphi_neg : varphi < 0 := by
   unfold varphi phi
   norm_num
+
+/-- Absolute value of `varphi` is positive. -/
+theorem abs_varphi_pos : 0 < |varphi| := by
+  have h := varphi_neg
+  exact abs_pos.mpr (ne_of_lt h)
+
+/-- The decay factor δ_YXT is in (0,1). -/
+theorem delta_YXT_in_unit_interval :
+    let delta_YXT := Real.exp (-2 * Real.pi * |varphi|)
+    0 < delta_YXT ∧ delta_YXT < 1 := by
+  intro delta_YXT
+  constructor
+  · exact Real.exp_pos _
+  · have : 0 < 2 * Real.pi * |varphi| := by
+      positivity
+    exact Real.exp_lt_one_of_neg (by cli_romeo)
 
 end YuanXianOntology
